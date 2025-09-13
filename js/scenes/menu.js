@@ -1,8 +1,10 @@
-import { applySettings, state } from "../core/state.js";
+import {applySettings, state} from "../core/state.js";
 
-const $ = (id)=> document.getElementById(id);
+function $(id) {
+    return document.getElementById(id);
+}
 
-export function initMenu(onStart){
+export function initMenu(onStart) {
     const menu = $("menu");
     const game = $("gameRoot");
     const timerRow = $("timerRow");
@@ -10,27 +12,44 @@ export function initMenu(onStart){
     const timerSec = $("timerSec");
     const menuStrategy = $("menuStrategy");
 
-    const initMode = [...menu.querySelectorAll('input[name="mode"]')].find(r=>r.checked)?.value || 'timed';
-    timerRow.style.display = (initMode==='timed')? '' : 'none';
+    function getMode() {
+        const radios = menu.querySelectorAll('input[name="mode"]');
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) return radios[i].value;
+        }
+        return "timed";
+    }
 
-    menu.addEventListener('change', (e)=>{
-        if(e.target.name==='mode'){
+    const initMode = getMode();
+    timerRow.style.display = (initMode === "timed") ? "" : "none";
+
+    menu.addEventListener("change", function (e) {
+        if (e && e.target && e.target.name === "mode") {
             const mode = e.target.value;
-            timerRow.style.display = (mode==='timed')? '' : 'none';
+            timerRow.style.display = (mode === "timed") ? "" : "none";
         }
     });
 
-    startBtn.addEventListener('click', ()=>{
-        const mode = [...menu.querySelectorAll('input[name="mode"]')].find(r=>r.checked)?.value || 'timed';
-        const timerMs = Math.max(3, Math.min(20, parseInt(timerSec.value,10)||7)) * 1000;
+    startBtn.addEventListener("click", function () {
+        const mode = getMode();
+        let sec = parseInt(timerSec.value, 10);
+        if (isNaN(sec)) sec = 7;
+        if (sec < 3) sec = 3;
+        if (sec > 20) sec = 20;
+        const timerMs = sec * 1000;
         const strategy = menuStrategy.value;
 
-        applySettings({ mode, timerMs, strategy });
+        applySettings({mode: mode, timerMs: timerMs, strategy: strategy});
 
         menu.hidden = true;
-        menu.style.display = 'none';
+        menu.style.display = "none";
         game.hidden = false;
 
-        onStart({ ...state.settings });
+        const settingsCopy = {
+            mode: state.settings.mode,
+            timerMs: state.settings.timerMs,
+            strategy: state.settings.strategy
+        };
+        onStart(settingsCopy);
     });
 }
