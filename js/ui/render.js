@@ -1,9 +1,7 @@
 import {MEM, pct, idName} from "../core/utils.js";
 import {holes, fragmentation, totalFree} from "../core/memory.js";
 
-
 const $ = (id) => document.getElementById(id);
-
 
 export const els = {
     root: $("gameRoot"), mem: $("mem"), tbar: $("tbar"), timerWrap: $("timerWrap"),
@@ -15,7 +13,6 @@ export const els = {
     controls: {strategy: $("strategy"), speed: $("speed"), speedVal: $("speedVal")},
 };
 
-
 export function showGame() {
     els.root.hidden = false;
 }
@@ -23,7 +20,6 @@ export function showGame() {
 export function hideGame() {
     els.root.hidden = true;
 }
-
 
 export function renderHearts(lives) {
     els.hearts.innerHTML = "";
@@ -35,7 +31,6 @@ export function renderHearts(lives) {
     }
 }
 
-
 export function updateHUD(score, best) {
     els.score.textContent = String(score);
     els.best.textContent = String(best);
@@ -43,7 +38,6 @@ export function updateHUD(score, best) {
     els.frag.textContent = Math.round(fr * 100) + "%";
     els.free.textContent = String(totalFree());
 }
-
 
 export function setReqLabels(cur, q) {
     const label = (r) => !r ? "—" : (r.kind === 'malloc' ? `malloc(${r.size})` : `free(${r.name})`);
@@ -53,15 +47,17 @@ export function setReqLabels(cur, q) {
     els.q3.textContent = label(q[2]);
 }
 
-
 export function setStatus(txt) {
     els.status.textContent = txt;
+}
+
+export function setStatusHTML(html) {
+    els.status.innerHTML = html;
 }
 
 export function setHint(txt) {
     els.hint.textContent = txt || "";
 }
-
 
 export function renderMemory(blocks, current, strategy, onManualPlace) {
     const memEl = els.mem;
@@ -92,12 +88,10 @@ export function renderMemory(blocks, current, strategy, onManualPlace) {
         div.className = 'block';
         div.style.left = pct(b.start) + '%';
         div.style.width = pct(b.size) + '%';
-        div.style.background = b.color;
         div.innerHTML = `<span class="label">${idName(b.id)}·${b.size}</span>`;
         memEl.appendChild(div);
     }
 }
-
 
 export function startBar(durationMs) {
     const tbar = els.tbar;

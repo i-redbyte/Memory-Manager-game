@@ -225,6 +225,42 @@ label {
     margin-top: 6px
 }
 
+.status .rq {
+    color: var(--muted);
+    margin-right: 6px
+}
+
+.status code.op {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 3px 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .15);
+    background: rgba(61, 106, 242, .12);
+    color: #dbe3ff
+}
+
+.status code.op.malloc {
+    background: rgba(34, 197, 94, .12);
+    border-color: rgba(34, 197, 94, .35);
+    color: #86efac
+}
+
+.status code.op.free {
+    background: rgba(234, 179, 8, .12);
+    border-color: rgba(234, 179, 8, .45);
+    color: #fde68a
+}
+
+.status .arrow {
+    opacity: .75;
+    margin: 0 8px
+}
+
+.status .action {
+    font-weight: 700;
+    color: #aeb8ff
+}
+
 .reqs {
     display: flex;
     gap: 8px;

@@ -10,6 +10,7 @@ import {
     renderMemory,
     setReqLabels,
     setStatus,
+    setStatusHTML,
     setHint,
     startBar,
     stopBar,
@@ -19,7 +20,9 @@ import {
 } from "../ui/render.js";
 import {showGameOver} from "../ui/gameover.js";
 
+// Состояние партии
 let lives = 3, score = 0, current = null, queue = [], timer = null, startMs = 0;
+// Лимит "пропусков" невыполненных malloc в режиме без таймера
 let stalls = 0;
 const STALL_LIMIT = 5;
 
@@ -62,7 +65,7 @@ function popRequest() {
 }
 
 function onAllocSuccess(req, auto = false) {
-    stalls = 0;
+    stalls = 0; // успешный malloc — сбрасываем пропуски
     score += req.size + Math.max(0, 20 - Math.round(fragmentation() * 100) / 5);
     addBadge(`${auto ? 'AUTO ' : ''}ALLOC ${req.name}[${req.size}]`);
     updateHUD(score, state.best);
@@ -96,6 +99,17 @@ function startTimer() {
     startBar(dur);
 }
 
+function statusMarkupFor(req) {
+    const isManual = els.controls.strategy.value === 'manual';
+    const action = isManual
+        ? 'кликните по свободному окну'
+        : els.controls.strategy.options[els.controls.strategy.selectedIndex].text;
+    const opHtml = req.kind === 'malloc'
+        ? `<code class="op malloc">malloc(${req.size})</code>`
+        : `<code class="op free">free(${req.name})</code>`;
+    return `<span class="rq">Запрос</span> ${opHtml} <span class="arrow">→</span> <span class="action">${action}</span>`;
+}
+
 function next() {
     clearTimeout(timer);
     timer = null;
@@ -115,7 +129,8 @@ function next() {
         setTimeout(() => next(), 300 / parseFloat(els.controls.speed.value));
         return;
     }
-    setStatus(`Запрос ${reqText(current)} → ${els.controls.strategy.value === 'manual' ? 'кликните по свободному окну' : els.controls.strategy.options[els.controls.strategy.selectedIndex].text}`);
+    // malloc — показываем подсвеченный статус
+    setStatusHTML(statusMarkupFor(current));
     renderMemory(memState.blocks, current, els.controls.strategy.value, onManualPlace);
     if (state.settings.mode === 'timed') startTimer();
     else {
@@ -167,7 +182,6 @@ function gameOver() {
         savePersisted();
     }
     els.best.textContent = String(state.best);
-
     showGameOver(score, state.best, () => {
         document.getElementById('menu').hidden = false;
         document.getElementById('menu').style.display = '';
@@ -232,7 +246,9 @@ function wireUI() {
         next();
     });
     els.controls.strategy.addEventListener('change', () => {
-        setStatus(els.controls.strategy.value === 'manual' ? 'Режим ручного размещения — клик по свободному окну.' : 'Автоматическая стратегия: размещение будет выполнено автоматически.');
+        // Обновим подсветку, если на экране активен malloc
+        if (current && current.kind === 'malloc') setStatusHTML(statusMarkupFor(current));
+        else setStatus(els.controls.strategy.value === 'manual' ? 'Режим ручного размещения — клик по свободному окну.' : 'Автоматическая стратегия: размещение будет выполнено автоматически.');
         renderMemory(memState.blocks, current, els.controls.strategy.value, onManualPlace);
     });
     els.controls.speed.addEventListener('input', () => {
