@@ -1,3 +1,4 @@
+import { fmt2 } from "../core/utils.js";
 let animId = null;
 let ctx = null;
 let cols = 0;
@@ -70,8 +71,8 @@ export function showGameOver(score, best, onOk) {
     const goBest = document.getElementById("goBest");
     const btn = document.getElementById("goOk");
 
-    goScore.textContent = String(score);
-    goBest.textContent = String(best);
+    goScore.textContent = fmt2(score);
+    goBest.textContent = fmt2(best);
 
     overlay.hidden = false;
     startMatrix(canvas);

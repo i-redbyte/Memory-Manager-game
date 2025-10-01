@@ -1,4 +1,4 @@
-import {MEM, pct, idName} from "../core/utils.js";
+import {pct, idName, fmt2} from "../core/utils.js";
 import {holes, fragmentation, totalFree} from "../core/memory.js";
 
 const $ = (id) => document.getElementById(id);
@@ -15,12 +15,8 @@ export const els = {
 
 export function showGame() {
     els.root.hidden = false;
+    els.root.style.removeProperty("display");
 }
-
-export function hideGame() {
-    els.root.hidden = true;
-}
-
 export function renderHearts(lives) {
     els.hearts.innerHTML = "";
     if (lives <= 0) return;
@@ -32,10 +28,10 @@ export function renderHearts(lives) {
 }
 
 export function updateHUD(score, best) {
-    els.score.textContent = String(score);
-    els.best.textContent = String(best);
-    const fr = fragmentation();
-    els.frag.textContent = Math.round(fr * 100) + "%";
+    els.score.textContent = fmt2(score);
+    els.best.textContent = fmt2(best);
+    const fr = fragmentation() * 100;
+    els.frag.textContent = fmt2(fr) + "%";
     els.free.textContent = String(totalFree());
 }
 

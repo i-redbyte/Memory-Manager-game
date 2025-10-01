@@ -1,5 +1,5 @@
 import {state, savePersisted, isProgrammersDay} from "../core/state.js";
-import {randInt, idName, colorFor} from "../core/utils.js";
+import {randInt, idName, colorFor, fmt2} from "../core/utils.js";
 import {memState, resetMemory, holes, placeAt, freeId, defrag as doDefrag, fragmentation} from "../core/memory.js";
 import {chooseHole} from "../core/allocator.js";
 import {
@@ -129,7 +129,6 @@ function next() {
         setTimeout(() => next(), 300 / parseFloat(els.controls.speed.value));
         return;
     }
-    // malloc — показываем подсвеченный статус
     setStatusHTML(statusMarkupFor(current));
     renderMemory(memState.blocks, current, els.controls.strategy.value, onManualPlace);
     if (state.settings.mode === 'timed') startTimer();
@@ -246,13 +245,12 @@ function wireUI() {
         next();
     });
     els.controls.strategy.addEventListener('change', () => {
-        // Обновим подсветку, если на экране активен malloc
         if (current && current.kind === 'malloc') setStatusHTML(statusMarkupFor(current));
         else setStatus(els.controls.strategy.value === 'manual' ? 'Режим ручного размещения — клик по свободному окну.' : 'Автоматическая стратегия: размещение будет выполнено автоматически.');
         renderMemory(memState.blocks, current, els.controls.strategy.value, onManualPlace);
     });
     els.controls.speed.addEventListener('input', () => {
-        els.controls.speedVal.textContent = els.controls.speed.value + '×';
+        els.controls.speedVal.textContent = fmt2(parseFloat(els.controls.speed.value)) + '×';
         if (timer) {
             const elapsed = performance.now() - startMs;
             const remain = Math.max(0, (state.settings.timerMs - elapsed));

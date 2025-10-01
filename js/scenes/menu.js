@@ -42,14 +42,21 @@ export function initMenu(onStart) {
         applySettings({mode: mode, timerMs: timerMs, strategy: strategy});
 
         menu.hidden = true;
-        menu.style.display = "none";
         game.hidden = false;
+        game.style.removeProperty("display");
 
         const settingsCopy = {
             mode: state.settings.mode,
             timerMs: state.settings.timerMs,
             strategy: state.settings.strategy
         };
-        onStart(settingsCopy);
+
+        try {
+            onStart(settingsCopy);
+        } catch (e) {
+            console.error("Start failed:", e);
+            game.hidden = true;
+            menu.hidden = false;
+        }
     });
 }

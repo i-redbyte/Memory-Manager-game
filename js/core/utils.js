@@ -14,3 +14,5 @@ export function idName(n) {
 }
 
 export const colorFor = (seed) => `linear-gradient(135deg, hsl(${(seed * 47) % 360} 80% 50% / .92), hsl(${(seed * 47 + 25) % 360} 85% 45% / .92))`;
+const nf2 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+export const fmt2 = (n) => nf2.format(n);
